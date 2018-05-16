@@ -1,0 +1,135 @@
+索引与模版
+--------------------------------------------
+删除索引：
+$ curl -XDELETE localhost:9200/test
+新建模版：
+put:http://地址/_template/test_default
+{
+    "order":0,
+    "template":"go_video*",
+    "settings":{
+
+    },
+    "mappings":{
+        "_default_":{
+            "numeric_detection":true,
+            "dynamic_templates":[
+                {
+                    "strings":{
+                        "mapping":{
+                            "type":"keyword"
+                        },
+                        "match_mapping_type":"string"
+                    }
+                }
+            ],
+            "properties":{
+                "orgin_id":{
+                    "type":"keyword"
+                },
+                "time":{
+                    "type":"date"
+                },
+                "device":{
+                    "properties":{
+                        "channel":{
+                            "type":"keyword"
+                        }
+                    }
+                },
+                "properties":{
+                	"properties":{
+                		"video_id":{
+                			"type":"keyword"
+                		}
+                	}
+                }
+            }
+        }
+    },
+    "aliases":{
+
+    }
+}
+
+往定义好的模版插入一条数据测试
+post：http://地址/test_ttt/test_type
+{
+    "user" : "kimchy",
+    "time2" : "1498445771619"
+}
+
+删除模版：http://地址/_template/test_default
+
+------------------------------------------------------------------
+kibana
+-------
+1.模糊搜索：
+properties.url = "～/v1/user/info～"
+搜索不能含有此项：-orgin_id: 413201
+orgin_id:T1000?
+orgin_id:T100*  *任意多个
+？和*都不能放在开头
+
+
+-------------------------------------------------------------------
+query
+-------
+1.GET go_video_firehose_stat-2018-03/_search?sort=timestamp:desc
+2.GET go_live_firehose_player-2018-04/_search
+  {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "term": {
+              "properties.type": "1"
+            }
+          },
+          {
+            "wildcard": {
+              "properties.url": "rtmp://*"
+            }
+          },{
+            "range": {
+              "FIELD": {
+                "gte": 10,
+                "lte": 20
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+3. "query": {
+          "wildcard": {
+              "postcode": "W?F*HW"
+          }
+      }
+   "query": {
+          "regexp": {
+              "postcode": "W[0-9].+"
+          }
+      }
+4. 模糊加聚合查询
+  GET go_live_firehose_api-2017-12/_search
+  {
+    "from": 0,
+    "size": 20,
+    "query": {
+      "wildcard": {
+        "properties.url": {
+          "value": "http://gliveapi.stage.gomo.com/api/v2/live_room/*/post_initialization"
+        }
+      }
+    },
+    "aggs": {
+      "avg_response_time": {
+        "avg": {
+          "field": "properties.response_time"
+        }
+      }
+    }
+  }
+-------------------------------------------------------------

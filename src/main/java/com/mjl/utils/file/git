@@ -1,0 +1,45 @@
+在分支开发的话
+git checkout -b dev
+git commit -m "修改“
+git checkout master
+git fetch
+git rebase
+git merge dev
+看情况git rebase
+---------------------------
+
+将远程分支检出到本地      git checkout -b 本地分支名 origin/远程分支名
+推送本地修改到远程分支    git push origin  HEAD:refs/for/dev-1.7
+恢复到跟远程一样         git reset --hard origin/master
+回退本地代码到2次提交前   git reset HEAD~2
+查看两个分支差异，commit左箭头表示左边的，右箭头表示右边的  git log --left-right master...master-bugfix
+按照某一次的commit完全反向的进行一次commit              git revert HEAD
+取消缓存区的修改         git reset HEAD <file>
+生成公私钥   ssh-keygen
+移除ssh密码  ssh-keygen -p
+展示该Git库下的所有分支  git branch -r
+---------------------------
+
+将dev的分支上的某次提交c0a5abda8ed500aeb16a120f85d930a3b194fa4c 提交到stage
+git checkout stage
+git cherry-pick c0a5abda8ed500aeb16a120f85d930a3b194fa4c
+
+----------------------------
+
+git push 出现 you are not allowed to upload merges 错误提示
+敲git rebase 然后按提示执行就行了，如果rebase 发生冲突的话，则修改，修改完后git add -u filename，然后git rebase --continue ，直到没有冲突为止。不需要commit
+
+----------------------------
+
+1.基本配置，标注为gerrit配置，配置后直接git push就可push到gerrit
+[remote "origin"]
+	url = ssh://majiali@gerrit.xx:29418/comment
+	fetch = +refs/heads/*:refs/remotes/origin/*
+	fetch = refs/notes/*:refs/notes/*
+	pushurl = ssh://majiali@gerrit.xx:29418/comment
+	push = HEAD:refs/for/master
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+-----------------------------
+

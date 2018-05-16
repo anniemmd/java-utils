@@ -1,0 +1,80 @@
+查看正在执行的sql: show full processlist;
+查询按分钟统计出来的数据: select date_format(create_time,'%Y-%m-%d %H:%i') ,count(*) from  表名 where create_time > '2014-7-11 07:20:00' and create_time < '2014-7-11 07:40:00' group by date_format(create_time,'%Y-%m-%d %H:%i')
+
+--------------------------
+创建表
+--------------------------
+CREATE TABLE `country` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `code` varchar(10) NOT NULL COMMENT '2位国家编码',
+  `name` varchar(50) NOT NULL COMMENT '国家名称,英文',
+  `name_cn` varchar(50) DEFAULT NULL COMMENT '国家名称,中文',
+  `capital` varchar(50) DEFAULT NULL COMMENT '首都',
+  `capital_utc_zoneid` varchar(10) DEFAULT NULL COMMENT '该国家首都的UTC时区',
+  `img_url` varchar(300) DEFAULT NULL COMMENT '国旗图片',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_country_code` (`code`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=256 DEFAULT CHARSET=utf8 COMMENT='国家信息表';
+
+---------------------------
+mysql修改表
+--------
+增加索引：
+ALTER TABLE table_name ADD UNIQUE  index_name (column_list)
+
+删除索引
+ALTER TABLE table_name DROP INDEX index_name
+
+修改字段名
+alter table test.END_USER_PASSWORD_CHANGE_LOG change extend2 MC_SITE_ID int(1)
+
+给字段增加注释
+ALTER TABLE test.END_USER_PASSWORD_CHANGE_LOG MODIFY COLUMN EXTEND2 bigint(20) COMMENT '独立域名网站id, 1=yihaodian.com,2=药网,3=SAM'
+
+增加字段
+alter table test.END_USER_PASSWORD_CHANGE_LOG add COLUMN MC_SITE_ID int(1) COMMENT '独立域名网站id, 1=yihaodian.com,2=药网,3=SAM';
+
+删除字段
+alter table test.END_USER_PASSWORD_CHANGE_LOG drop column MC_SITE_ID 
+
+修改字段类型
+alter table test.END_USER_SAM_CARD_NO_CHANGE_LOG CHANGE  CARD_NO_BEFORE CARD_NO_BEFORE   VARCHAR(50)
+
+修改字段名和类型
+alter table test.END_USER_SAM_CARD_NO_CHANGE_LOG CHANGE  CARD_NO_CHANGE SAM_CARD_NO_CHANGE   VARCHAR(50)
+
+
+----------------------------
+mysql求排名：
+求某分数的排名，相同分数算一名
+
+ select t.id,t.rank,t.score  from(SELECT @rownum := @rownum+1 AS 'Rank', a.*
+FROM (SELECT score, id
+       FROM t_user
+       ORDER BY score DESC) a, (SELECT @rownum := 0) r)t  where score=109 limit 1
+---------------------------
+分区
+-----
+修改表为分区表
+首先将主键改为包含create_time的联合主键
+ALTER TABLE `t_record` DROP PRIMARY KEY ,ADD PRIMARY KEY ( `id`, create_time)
+然后将唯一索引改成包含create_time
+ALTER TABLE `t_record` DROP index unique_record ,ADD unique KEY  unique_record( `dt`, account_id,create_time)
+然后创建一个分区：
+ALTER TABLE t_record
+PARTITION BY RANGE(TO_DAYS(create_time))(
+  PARTITION record_20180100 VALUES LESS THAN (TO_DAYS('2018-01-01'))
+);
+新建分区：
+ALTER TABLE t_record
+ADD PARTITION (PARTITION record_20180201 VALUES LESS THAN (TO_DAYS('2018-02-01')));
+
+查看已有分区：
+select
+  partition_name part,
+  partition_expression expr,
+  partition_description descr,
+  table_rows
+from information_schema.partitions  where
+  table_schema = schema()
+  and table_name='t_record';

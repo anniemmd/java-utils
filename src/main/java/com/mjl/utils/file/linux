@@ -1,0 +1,80 @@
+从头／尾看日志 ：sudo more error.log／sudo less error.log
+撤销上一步的操作 u
+恢复上一步被撤销的操作 Ctrl+r
+查看服务器系统 uname -a
+跳到行尾： $
+执行顺序为：/etc/profile -> (~/.bash_profile | ~/.bash_login | ~/.profile) -> ~/.bashrc -> /etc/bashrc -> ~/.bash_logout
+搜索日志 ：sudo grep "500" access_log.2018-02-09 | tail -200
+打印匹配行的前后5行 ：grep -5 'parttern' data.log
+定位到行首：ctrl + a
+
+-----------------------------
+1.统计
+tail -100 run.log |awk '{print $6}'
+打印第6列
+
+awk '{if($6=="Domain") ++sum} END{print sum}' run.log
+统计第6列为Domain出现的次数
+
+2.查看域名解析
+nslookup pbaspsws01.la.gomo.com
+
+3.查看DNS配置：
+sudo  cat /etc/resolv.conf
+可以在网络的DNS配置那里指定DNS
+chrome://net-internals/#dns  查看谷歌DNS缓存IP情况
+
+4.登录服务器：
+sudo ssh -p 37856 pbaspsws01.hk.gomo.com
+
+5.上传文件到服务器
+sudo scp -P 37856 firebase-api.zip majiali@pbaspsws02.hk.gomo.com:~
+
+6.将远程文件拷贝到本地
+sudo scp -P 37856 majiali@pbaspsws02.dc.gomo.com:/usr/local/tomcat_8.0.26_firebase-api/bin/jsvc /usr/local/tomcat_8.0.26_anonymity-social-api/bin/
+
+7.修改nginx配置文件后，使生效
+nginx -s reload
+或   sudo /etc/init.d/nginx reload
+
+8.端口占用：
+sudo lsof -i :9000 （查看端口所在进程）
+COMMAND   PID    USER   FD      TYPE             DEVICE                      SIZE/OFF      NODE       NAME
+Java      716      a    313u   IPv6              0x1111111111111             0t0           TCP        *:cslistener (LISTEN)
+然后根据PID杀进程：
+sudo kill -9 716
+
+9.session持久化
+持久化文件地址：
+<tomcat 安装目录>/work/Catalina/<主机名>/<应用程序名>/sessions.ser
+
+10.curl
+
+
+11.查看MAC IP
+ifconfig | grep "inet " | grep -v 127.0.0.1
+
+12.过滤响应时间大于100ms的
+sudo awk '($NF > 100){print $0}' access.2018-03-20.log
+cat access.2018-03-20.log |grep "locate/list"|awk -F "--" '{if($2>100)print$0}'
+
+13.求总数
+grep "is not exist" error.log | wc -l
+
+14.不打印某行
+cat error.log | grep -v  "is not exist"
+
+15.改变文件属组
+sudo chown -R jenkins_pressure:jenkins_pressure /home/jenkins_pressure/.ssh
+
+16.查看磁盘占用情况：
+df -m
+du -sh /data   查看某目录下磁盘占用总大小
+
+17.修改dns配置
+vim /etc/resolv.conf
+
+18.删除tomcat正在写的日志数据
+sudo chmod 666 access.2017-12-18-11.log
+sudo echo "" > access.2017-12-18-11.log
+-------------------------------
