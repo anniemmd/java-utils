@@ -49,9 +49,9 @@ public class M6 {
             while (flage){
                 Data data = new Data(M6.id.incrementAndGet(), Thread.currentThread().getName());
                 try {
-                    queue.put(data);
+                    queue.add(data);
                     System.out.printf("producer one data ,id is %d, name is %s%n", data.getId(), data.getName());
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
