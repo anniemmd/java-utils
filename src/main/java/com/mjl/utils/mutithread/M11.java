@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * 信号量的使用
  * 10个资源，100个人去占用，避免并发
  */
-public class M10 {
+public class M11 {
      static Semaphore semaphore = new Semaphore(10);
      static List<Boolean> resources = new ArrayList<>();
      static ReentrantLock lock = new ReentrantLock(true);
@@ -23,15 +23,16 @@ public class M10 {
         }
 
         public static Integer getResourceId(){
+            int id =-1;
             lock.lock();
             for(int i=0; i<10;i++){
                 if(resources.get(i) == false){
                     resources.set(i, true);
-                    return i;
+                   id = i;
                 }
             }
             lock.unlock();
-            return null;
+            return id;
         }
     }
 
