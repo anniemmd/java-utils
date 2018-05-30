@@ -10,41 +10,44 @@ package com.mjl.utils.mutithread;
  */
 public class M7 {
     private static Object obj = new Object();
+    private static int i =0;
+    private static int total = 100;
 
     public static void main(String[] args) {
         Thread a = new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (M7.obj){
-                for(int i=0; i<100;i+=2){
-                        System.out.println(Thread.currentThread().getName()+":"+i);
-                    try {
-                        notify();
-                        wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    while(i<=total){
+                        synchronized (M7.obj){
+                            System.out.println(Thread.currentThread().getName()+":"+ i++);
+                            try {
+                                obj.notify();
+                                obj.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                     }
                 }
-                }
             }
-        });
+        },"B");
 
         Thread b = new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized(M7.obj){
-                for (int i=1; i<100; i+=2){
-                    try {
-                        System.out.println(Thread.currentThread().getName() +":" + i);
-                        notify();
-                        wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    while (i<=total){
+                        synchronized(M7.obj){
+                            try {
+                                System.out.println(Thread.currentThread().getName() +":" + i++);
+                                obj.notify();
+                                obj.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                     }
-                }
+
                 }
             }
-        });
+        }, "A");
 
 
         a.start();

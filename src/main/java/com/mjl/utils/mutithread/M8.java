@@ -1,20 +1,20 @@
 package com.mjl.utils.mutithread;
 
 /**
- * Created by majiali on 2018/5/30.
- * 线程通信
- * 用两个线程分别打印0-100之间的奇偶数。
-     比如 有A，B两个线程；
-     A线程打印1，3，5，7，9 … 99
-     B线程打印0，2，4，6，8 … 100
+ * 编写一个算法实现倒序输出一个字符串，比如输入hello world，输出dlrow ollel.
  */
 public class M8 {
-    private  Object a = new Object();
 
     public static void main(String[] args) {
+        String s= "hello world";
+        StringBuilder result = new StringBuilder(s);
+        System.out.println("1:" + result.reverse().toString());
 
-
-
+        result = new StringBuilder();
+        for(int i=s.length()-1; i >= 0; i--){
+            result.append(s.charAt(i));
+        }
+        System.out.println(result);
 
     }
 }
