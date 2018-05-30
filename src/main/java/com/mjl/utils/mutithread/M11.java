@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * 10个资源，100个人去占用，避免并发
  */
 public class M11 {
-     static Semaphore semaphore = new Semaphore(10);
+     static Semaphore semaphore = new Semaphore(10,true);
      static List<Boolean> resources = new ArrayList<>();
      static ReentrantLock lock = new ReentrantLock(true);
 
