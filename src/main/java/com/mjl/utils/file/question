@@ -434,7 +434,11 @@ https://www.journaldev.com/java-interview-questions
 4.JVM常用参数
     -Xms3550m， 初始化堆大小。通常情况和-Xmx大小设置一样，避免虚拟机频繁自动计算后调整堆大小。
     -Xmx3550m，最大堆大小。
+<<<<<<< HEAD
     -Xmn2g，新生代大小。Sun官方推荐配置为整个堆的3/8。
+=======
+    -xmn2g，新生代大小。Sun官方推荐配置为整个堆的3/8。
+>>>>>>> 82d77fade95f865f9809a347a2c841dc97cd3ae9
     -XX:SurvivorRatio=8。Eden和Survivor的比值。
     老年代=整个堆大小-新生代-永久代
     -XX:Permsize=512m,设置永久代初始值。
