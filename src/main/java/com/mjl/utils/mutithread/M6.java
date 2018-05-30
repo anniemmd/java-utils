@@ -101,10 +101,15 @@ public class M6 {
     public static void main(String[] args) {
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         Producer producer1 = new Producer(queue);
+        Producer producer2 = new Producer(queue);
+
         Consumer consumer1 = new Consumer(queue);
+        Consumer consumer2 = new Consumer(queue);
 
         executorService.execute(producer1);
         executorService.execute(consumer1);
+        executorService.execute(producer2);
+        executorService.execute(consumer2);
 
         try {
             Thread.sleep(5000);
@@ -113,6 +118,7 @@ public class M6 {
         }
 
         producer1.stop();
+        producer2.stop();
 
         try {
             Thread.sleep(5000);
@@ -121,5 +127,7 @@ public class M6 {
         }
 
         consumer1.stop();
+        consumer2.stop();
+        executorService.shutdown();
     }
 }
