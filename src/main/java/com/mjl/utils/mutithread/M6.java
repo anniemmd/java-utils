@@ -1,6 +1,9 @@
 package com.mjl.utils.mutithread;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -9,94 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class M6 {
     static BlockingQueue<Data> queue = new ArrayBlockingQueue<Data>(10);
-    private static volatile AtomicInteger id = new AtomicInteger(1);
-
-
-    static class Data{
-        public Data(Integer id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        private Integer id;
-        private String name;
-
-        public Integer getId() {
-            return id;
-        }
-
-        public void setId(Integer id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-    }
-
-    static class Producer implements Runnable{
-        private BlockingQueue<Data> queue;
-        public Producer(BlockingQueue<Data> queue){
-            this.queue = queue;
-        }
-        private volatile Boolean flage = true;
-
-        public void put(){
-            while (flage){
-                Data data = new Data(M6.id.incrementAndGet(), Thread.currentThread().getName());
-                try {
-                    queue.add(data);
-                    System.out.printf("producer one data ,id is %d, name is %s%n", data.getId(), data.getName());
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void stop(){
-            flage = false;
-        }
-
-        @Override
-        public void run() {
-            put();
-        }
-    }
-
-    static class Consumer implements Runnable{
-        private BlockingQueue<Data> queue;
-        public Consumer(BlockingQueue<Data> queue){
-            this.queue = queue;
-        }
-
-        private volatile Boolean flag = true;
-
-        public void take(){
-            while (flag){
-                try {
-                    Data da = queue.take();
-                    System.out.printf("consumer take the data id is %d, name is %s%n", da.getId(),da.getName());
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void stop(){
-            flag = false;
-        }
-
-        @Override
-        public void run() {
-            take();
-        }
-    }
+    static volatile AtomicInteger id = new AtomicInteger(1);
 
     public static void main(String[] args) {
         ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -129,5 +45,92 @@ public class M6 {
         consumer1.stop();
         consumer2.stop();
         executorService.shutdown();
+    }
+}
+
+ class Consumer implements Runnable{
+    private BlockingQueue<Data> queue;
+    public Consumer(BlockingQueue<Data> queue){
+        this.queue = queue;
+    }
+
+    private volatile Boolean flag = true;
+
+    public void take(){
+        while (flag){
+            try {
+                Data da = queue.take();
+                System.out.printf("consumer take the data id is %d, name is %s%n", da.getId(),da.getName());
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void stop(){
+        flag = false;
+    }
+
+    @Override
+    public void run() {
+        take();
+    }
+}
+
+
+ class Producer implements Runnable{
+     BlockingQueue<Data> queue;
+    public Producer(BlockingQueue<Data> queue){
+        this.queue = queue;
+    }
+    private volatile Boolean flage = true;
+
+    public void put(){
+        while (flage){
+            Data data = new Data(M6.id.incrementAndGet(), Thread.currentThread().getName());
+            try {
+                queue.put(data);
+                System.out.printf("producer one data ,id is %d, name is %s%n", data.getId(), data.getName());
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void stop(){
+        flage = false;
+    }
+
+    @Override
+    public void run() {
+        put();
+    }
+}
+
+class Data{
+    public Data(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    private Integer id;
+    private String name;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

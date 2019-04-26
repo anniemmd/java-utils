@@ -9,17 +9,17 @@ public class M5 {
      static String b = "2";
 
     public static void main(String[] args) {
-        Thread a = new Thread(new A());
-        Thread b = new Thread(new B());
-        a.start();
-        b.start();
+        t1.start();
+        t2.start();
+
     }
 
-   static  class A implements Runnable{
-         @Override
-         public void run() {
+   static Thread t1 = new Thread(new Runnable() {
+        @Override
+        public void run() {
             synchronized(M5.a){
                 try {
+                    System.out.println("ttt1");
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -28,24 +28,23 @@ public class M5 {
                     System.out.println("11111");
                 }
             }
-         }
-     }
-
-   static  class B implements Runnable{
-
-         @Override
-         public void run() {
-             synchronized (M5.b){
-                 try {
-                     Thread.sleep(1000);
-                 } catch (InterruptedException e) {
-                     e.printStackTrace();
-                 }
-                 synchronized (M5.a){
-                     System.out.println("22222");
-                 }
-             }
-         }
-     }
+        }
+    });
+    static Thread t2 = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            synchronized (M5.b){
+                try {
+                    System.out.println("ttt2");
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                synchronized (M5.a){
+                    System.out.println("22222");
+                }
+            }
+        }
+    });
 
 }

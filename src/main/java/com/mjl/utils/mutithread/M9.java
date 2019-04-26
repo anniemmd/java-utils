@@ -6,21 +6,6 @@ package com.mjl.utils.mutithread;
  */
 public class M9 {
 
-    static class Mut implements Runnable{
-
-        @Override
-        public void run() {
-            for(int i=0; i<10; i++){
-                System.out.print(i);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
     public static void main(String[] args){
         System.out.println("start");
         Thread t = new Thread(new Mut());
@@ -32,5 +17,20 @@ public class M9 {
         }
         System.out.println("end");
 
+    }
+}
+
+class Mut implements Runnable{
+
+    @Override
+    public void run() {
+        for(int i=0; i<10; i++){
+            System.out.print(i);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

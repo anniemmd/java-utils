@@ -5,17 +5,9 @@
 跳到行尾： $
 执行顺序为：/etc/profile -> (~/.bash_profile | ~/.bash_login | ~/.profile) -> ~/.bashrc -> /etc/bashrc -> ~/.bash_logout
 搜索日志 ：sudo grep "500" access_log.2018-02-09 | tail -200
-打印匹配行的前后5行 ：grep -5 'parttern' data.log
 定位到行首：ctrl + a
 
 -----------------------------
-1.统计
-tail -100 run.log |awk '{print $6}'
-打印第6列
-
-awk '{if($6=="Domain") ++sum} END{print sum}' run.log
-统计第6列为Domain出现的次数
-
 2.查看域名解析
 nslookup pbaspsws01.la.gomo.com
 
@@ -58,12 +50,6 @@ ifconfig | grep "inet " | grep -v 127.0.0.1
 sudo awk '($NF > 100){print $0}' access.2018-03-20.log
 cat access.2018-03-20.log |grep "locate/list"|awk -F "--" '{if($2>100)print$0}'
 
-13.求总数
-grep "is not exist" error.log | wc -l
-
-14.不打印某行
-cat error.log | grep -v  "is not exist"
-
 15.改变文件属组
 sudo chown -R jenkins_pressure:jenkins_pressure /home/jenkins_pressure/.ssh
 
@@ -78,3 +64,48 @@ vim /etc/resolv.conf
 sudo chmod 666 access.2017-12-18-11.log
 sudo echo "" > access.2017-12-18-11.log
 -------------------------------
+
+grep 相关
+
+求总数
+grep "is not exist" error.log | wc -l
+
+排除打印
+cat error.log | grep -v  "is not exist"
+grep -v rCode=0 info.log
+
+打印匹配行的前后5行
+grep -C 5 'parttern' info.log --color
+
+查看进程启动时间
+ps -eo pid,lstart,etime,cmd | grep java 
+或  ps -eo pid,lstart,etime,cmd | grep 19 
+或  ps -eo pid,lstart | grep 19
+
+------------------------------
+
+awk 相关
+
+打印第6列,列按空格分开
+tail -100 run.log |awk '{print $6}'
+
+统计第6列为Domain出现的次数
+awk '{if($6=="Domain") ++sum} END{print sum}' run.log
+
+打印含指定内容的第2列
+awk '/seq=713.*op=.*1209/ {print $2}' info.log
+
+-F 指定分隔符
+less info.log | grep "0x63" | grep "res" | awk -F '`' '{printf $9"\n"}' | awk -F '=' '{printf $2"\n"}' | sort -nr  | head -50
+
+grep seq=383 info.log | awk -F '`' '{if($9=="t=213") print $9}'
+或
+grep seq=383 info.log | awk -F '`' '{if($9=="t=213") {print $9}}'
+
+grep seq=383 info.log | awk -F '`' '{if($9=="t=213") {print $9} else {print $8}}'
+-----------------------------
+cut
+
+获取切割后的字符串，按`切割，第一个
+grep res info.log | cut -d '`' -f 1
+

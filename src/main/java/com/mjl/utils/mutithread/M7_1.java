@@ -13,42 +13,40 @@ public class M7_1 {
     private static volatile Boolean flag = true;
     private static int total =100;
 
-
-    static Thread a = new Thread(new Runnable() {
-        @Override
-        public void run() {
-            while (num <= total){
-                if(flag==true){
-                    System.out.println(Thread.currentThread().getName() +":" + num++);
-                }
-                flag = false;
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    },"B");
-
-    static Thread b = new Thread(new Runnable() {
-        @Override
-        public void run() {
-            while (num <= total){
-                if(flag == false){
-                    System.out.println(Thread.currentThread().getName() + ":" + num++);
-                }
-                flag = true;
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    },"A");
-
     public static void main(String[] args) {
+         Thread a = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (num <= total){
+                    if(flag==true){
+                        System.out.println(Thread.currentThread().getName() +":" + num++);
+                    }
+                    flag = false;
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        },"B");
+
+         Thread b = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (num <= total){
+                    if(flag == false){
+                        System.out.println(Thread.currentThread().getName() + ":" + num++);
+                    }
+                    flag = true;
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        },"A");
         a.start();
         b.start();
     }

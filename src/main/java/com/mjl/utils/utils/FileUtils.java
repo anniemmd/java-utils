@@ -162,13 +162,58 @@ public class FileUtils {
     }
 
     /**
-     * 向文件追加字符
+     * 向文件追加字符 true
+     * 替换 false
      * @throws IOException
      */
-    public void addToFile() throws IOException {
+    public static void addToFile(String text) throws IOException {
         File b = new File("/data/text.txt");
         FileWriter fw = new FileWriter(b, true);
-        fw.write("这是追加的字符");
+        fw.write(text);
         fw.close();
     }
+
+    private static Set<String> read(String path){
+        File file = new File(path);
+        Set<String> records = new HashSet<>();
+        if(file.exists()){
+            try {
+                FileReader fileReader = new FileReader(file);
+                BufferedReader br = new BufferedReader(fileReader);
+                String lineContent = null;
+                while((lineContent = br.readLine())!=null){
+                    records.add(lineContent);
+                }
+                br.close();
+                fileReader.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return records;
+    }
+
+    public static void main(String[] args) {
+        try {
+            //读取某个标签下的用户id集合
+            StringBuilder text = new StringBuilder();
+            Set<String> userIds = read("/Users/majiali/Desktop/user_data.txt");
+
+            //插入标签详情数据
+            Integer labelId= 1;
+            int index = 1;
+            for(String userId : userIds){
+                text.append(String.format("(%d, %d, %d, '2019-04-26 15:35:18', '2019-04-26 15:35:18'),\n", index++, labelId, Long.parseLong(userId)));
+            }
+
+            //写入文件
+            addToFile(text.toString());
+        } catch (IOException e) {
+        }
+    }
+
+
 }

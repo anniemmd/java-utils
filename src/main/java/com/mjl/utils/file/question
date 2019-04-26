@@ -16,7 +16,8 @@ https://www.journaldev.com/java-interview-questions
     我们说线程靠抢CPU时间片而执行，谁抢的多谁利用CPU的时间就多也就执行得快。而决定这个争抢能力的就是线程的优先级，线程优先级高的在同一时间越能获得CPU时间片。
     你可以为线程指定由 ThreadPriority枚举定义的优先级，默认情况下创建线程的优先级是ThreadPriority.Normal，
     原则上相同优先级的线程会获得相同的CPU时间。一旦给线程设置了优先级，那么操作系统会根据线程的优先级调度线程的执行。这里要注意一个问题，
-    操作系统可以在线程间切换时动态地调整线程的优先级，这样的话也就是说有时候你设的优先级可能得不到给定的效果，因为此线程可能已经被操作系统更改了优先级。另外，线程的优先级不影响该线程的运行状态，你只要确保该线程的状态在操作系统调度该线程之前为Running就可以了，你可以在线程定义时或线程运行时随时改变线程的优先级。
+    操作系统可以在线程间切换时动态地调整线程的优先级，这样的话也就是说有时候你设的优先级可能得不到给定的效果，因为此线程可能已经被操作系统更改了优先级。另外，
+    线程的优先级不影响该线程的运行状态，你只要确保该线程的状态在操作系统调度该线程之前为Running就可以了，你可以在线程定义时或线程运行时随时改变线程的优先级。
 
 4.线程调度器？
      负责为runnable状态的线程分配cpu时间，线程的执行依赖于它
@@ -31,6 +32,9 @@ https://www.journaldev.com/java-interview-questions
 7.死锁的四个必要条件：
     互斥条件、不可剥夺、部分分配、环路条件
     解决方法：打破它的条件
+    1.所有进程在运行之前，必须一次性地申请在整个运行过程中所需的全部资源
+    2.如果占有某些资源的一个进程进行进一步资源请求被拒绝，则该进程必须释放它最初占有的资源，如果有必要，可再次请求这些资源和另外的资源。
+    3.将系统中的所有资源统一编号，进程可在任何时刻提出资源申请，但所有申请必须按照资源的编号顺序（升序）提出。这样做就能保证系统不出现死锁
 
 8.如何保证线程安全：
     当多个线程同时访问临界资源（一个对象，对象中的属性，一个文件，一个数据库等）时，就可能会产生线程安全问题。不过，当多个线程执行一个方法，方法内部的局部变量并不是临界资源，因为方法是在栈上执行的，而Java栈是线程私有的，因此不会产生线程安全问题。
@@ -84,6 +88,22 @@ https://www.journaldev.com/java-interview-questions
     5.偏向锁：
      无竞争条件下 消除整个同步互斥，连CAS都不操作
 
+16.实现多线程有哪些方式?
+   JAVA多线程实现方式主要有三种：继承Thread类、实现Runnable接口、使用ExecutorService、Callable、Future实现有返回结果的多线程。其中前两种方式线程执行完后都没有返回值，只有最后一种是带返回值的。
+   https://www.jianshu.com/p/7950ea349dbb
+
+17.Thread的 notify给notifyAll的区别
+    notify 仅仅通知一个线程，并且我们不知道哪个线程会收到通知，然而 notifyAll 会通知所有等待中的线程。
+
+18.使用ThreadLocal不当可能会导致内存泄露
+    ThreadLocal的实现是这样的：每个Thread 维护一个 ThreadLocalMap 映射表，这个映射表的 key 是 ThreadLocal实例本身，
+    value 是真正需要存储的 Object。表示 ThreadLocalMap 是使用 ThreadLocal 的弱引用作为 Key 的，弱引用的对象在 GC 时会被回收.
+
+    使用static的ThreadLocal，延长了ThreadLocal的生命周期，可能导致的内存泄漏（参考ThreadLocal 内存泄露的实例分析）。
+    分配使用了ThreadLocal又不再调用get(),set(),remove()方法，那么就会导致内存泄漏。
+
+---------------------------------
+---------------------------------
 并发
 1.什么是阻塞队列？
     队列为空时，取、删除操作；队列满了时，往队列添加操作 都会被阻塞
@@ -140,6 +160,7 @@ https://www.journaldev.com/java-interview-questions
     两者都实现的是List接口,ArrayList是基于动态数组实现的，LinkedList是基于链表的数据结构;
     对于新增和删除操作LinkedList要强于ArrayList
     get訪问List内部随意元素时。ArrayList的性能要比LinkedList性能好
+    都是线程不安全的，线程安全可以用vector、ConcurrentLinkedQueue
 
 11.ArrayList与Vector的差别
     这两个类都实现了List接口（List接口继承自Collection接口）。它们都是有序集合。它们内部的元素都是能够反复的
@@ -159,7 +180,7 @@ https://www.journaldev.com/java-interview-questions
    list是有序集合，可以包含重复的元素，类似于动态数组
    hashmap允许键值为null，线程不安全
    hashtable不允许键值为null,线程安全
-   treemap用迭代器得到的建是有序的，默认递增，线程不安全
+   treemap用迭代器得到的建是有序的，默认递增，线程不安全（根据其键的自然顺序进行排序，或者根据创建映射时提供的 Comparator进行排序，具体取决于使用的构造方法。）
    arraylist线程不安全，vector线程安全
 
 15.rehash
@@ -176,16 +197,36 @@ https://www.journaldev.com/java-interview-questions
 17. Integer 内部缓存池
     缓存-128~127这些常用数值
 
-18. ArrayList LinkedList 使用区别，注意事项，线程安全
+18、hashmap的结构、原理，hash冲突的解决方案；
 
-19、hashmap的结构、原理，hash冲突的解决方案；
-
-20、红黑树的结构；
+19、红黑树的结构；
     1、每个节点都只能是红色或者黑色
     2、根节点是黑色
     3、每个叶节点（NIL节点，空节点）是黑色的。
     4、如果一个结点是红的，则它两个子节点都是黑的。也就是说在一条路径上不能出现相邻的两个红色结点。
     5、从任一节点到其每个叶子的所有路径都包含相同数目的黑色节点。
+
+20、string中加号连接符是怎么执行的?
+   对String对象进行 + 操作，实际上，会创建一个临时的StringBuilder对象进行实现拼接操作，用StringBuilder的append()方法拼接完毕，再调用toString()方法返回。 
+   而对于编译时常量，在编译后直接能计算出拼接后的字符串值，此时不需要再运行时创建临时StringBuilder对象。 
+
+21.hashmap有什么漏洞会导致他变慢
+    1.Hashmap在插入元素过多的时候需要进行Resize，
+        Resize的条件是 HashMap.Size >= Capacity * LoadFactor。
+    2.Hashmap的Resize包含扩容和ReHash两个步骤，ReHash在并发的情况下可能会形成链表环。
+    3.Hashmap在并发情况下还会造成元素丢失（这与内存可见性有关，当e.next==null的时候就会结束循环）
+    4.Hashmap在并发情况下还会造成size不准确（因为在判断是否需要扩容之前会做size++，其实这个时候size实际可能只是增加了1，现在确增加了2）
+    链表头插法的会颠倒原来一个散列桶里面链表的顺序。在并发的时候原来的顺序被另外一个线程a颠倒了，
+    而被挂起线程b恢复后拿扩容前的节点和顺序继续完成第一次循环后，又遵循a线程扩容后的链表顺序重新排列链表中的顺序，最终形成了环。
+
+22.HashMap的容量为什么一定要是2的幂呢
+    hash初始化会通过tableSizeFor保证是2的倍数，tableSizeFor的功能（不考虑大于最大容量的情况）是返回大于输入参数且最近的2的整数次幂的数
+    哈希值%容量=bucketIndex, 当容量是2的幂次方时,h&(length-1)==h%length,
+    如果length为2的次幂  则length-1 转化为二进制必定是11111……的形式在于h的二进制与操作效率会非常的快，
+    而且空间不浪费；如果length不是2的次幂，比如length为15，则length-1为14，对应的二进制为1110，在于h与操作，
+    最后一位都为0，而0001，0011，0101，1001，1011，0111，1101这几个位置永远都不能存放元素了
+
+
 ---------------------------------------
 ——————————————————————————————————————
  框架原理
@@ -354,9 +395,6 @@ https://www.journaldev.com/java-interview-questions
     structs2类级别的拦截，类属性被所有方法共享，springmvc方法级别的拦截，一个方法对应一个request上下文。
     SpringMVC的入口是servlet，而Struts2是filter
 
-27.mysql主从同步问题
-    binlog
-
 28.filter与servlet区别与联系
    继承接口不一样，初始化时间不一样，filter在servlet容器启动之后即初始化，filter可以线性的调用，servlet不会向下传递
 
@@ -369,6 +407,9 @@ https://www.journaldev.com/java-interview-questions
 
 31.mybatis实现原理
     动态代理，jdbc
+    mybatis-config.xml
+    SqlSessionFactoryBuilder->sqlSessionFactory->openSession()->sqlSession->getMapper()->执行
+
 
 32.gRPC
     语言中立，支持多种语言,基于标准的 HTTP/2 设计，支持双向流、消息头压缩、单 TCP 的多路复用、服务端推送等特性，这些特性使得 gRPC 在移动端设备上更加省电和节省网络流量；
@@ -413,8 +454,52 @@ https://www.journaldev.com/java-interview-questions
 
 41.怎么实现IOC
     最后也是实现Ioc最为核心的部分ClassPathXMLApplicationContext。这个类采用Jdom对application.xml文档进行解析。
-    大致思路是：通过读取配置文件中定义的全路径类名，利用java反射技术创建该类的实例。首先定义HashMap这样的一重数据结构用于存储创建的实例。
+    大致思路是：通过读取配置文件中定义的全路径类名，利用java反射技术创建该类的实例。首先定义HashMap这样的一种数据结构用于存储创建的实例。
     Key值就是配置文件的<bean>标签“id”,value值就是对应的实例。然后该类需要提供  public Object getBean(String name)方法返回实例对象。
+
+42.谈一谈对spring的理解
+    1.spring的核心技术
+    2.spring的优缺点
+
+43.分布式可用性和可靠性区别
+    如果系统在每小时崩溃1ms，那么它的可用性就超过99.9999%，但是它还是高度不可靠。
+    与之类似，如果一个系统从来不崩溃，但是每年要停机两星期，那么它是高度可靠的，但是可用性只有96%。
+
+44.Quartz框架的底层原理
+
+45.单例有多少种写法?有什么区别?你常用哪一种单例，为什么用这种
+    饿汉 :缺点：不是线程安全的。
+    懒汉 :
+        public class Singleton {
+            private static final Singleton instance = new Singleton();
+
+            private Singleton(){}
+
+            public static Singleton getInstance() {
+                return instance;
+            }
+        }
+        优点：在类装载时实例化，避免了多线程不同步的问题。
+        缺点：可能没有人调用getInstance()方法也会被实例化，浪费了资源。
+    静态内部类
+    双重校验锁
+
+46.spring加载过程
+    启动component-scan类扫描加载
+    initServletBean();
+    refresh()
+    ApplicationContext
+
+    在一个基于springmvc的web应用中，需要有一个web容器，一般我们用tomacat，这个web容器提供了一个全局的上下文环境ServletContext，同时也是Spring IoC容器的宿主环境。
+    宿主容器启动时，其入口文件便是web.xml。web.xml需要定义两个最基本的内容，ContextLoaderListener和DispatcherServlet。
+    1、ContextLoaderListener是实现了ServletContextListener接口的监听器，在项目启动的时候会触发容器初始化方法contextInitialized，容器初始化方法主要做3个事情
+    （1）执行initWebApplicationContext方法，启动一个根上下文WebApplicationContext（一个接口类），其实现类为XmlWebApplicationContext（即传说的IOC容器）。
+    （2）根据配置路径加载spring文件创建Bean的实例，这些bean都放入XmlWebApplicationContxt容器中。
+    （3）将加载好Bean实例的WebApplicationContext按指定的key注册到ServletContext（Java Web全局变量宿主容器）容器中去。
+    2、contextLoaderListener监听器监听容器初始化完成之后，开始初始化web.xml中配置的Servlet（可以配置多个），springmvc中以
+    DispatcherServlet为例。DispatcherServlet，前端控制器，也可以叫请求分发控制器，用来接收、匹配、处理、转发每个servlet请求。
+
+
 ——————————————————————————————————————
 --------------------------------------
  jvm
@@ -434,11 +519,7 @@ https://www.journaldev.com/java-interview-questions
 4.JVM常用参数
     -Xms3550m， 初始化堆大小。通常情况和-Xmx大小设置一样，避免虚拟机频繁自动计算后调整堆大小。
     -Xmx3550m，最大堆大小。
-<<<<<<< HEAD
     -Xmn2g，新生代大小。Sun官方推荐配置为整个堆的3/8。
-=======
-    -xmn2g，新生代大小。Sun官方推荐配置为整个堆的3/8。
->>>>>>> 82d77fade95f865f9809a347a2c841dc97cd3ae9
     -XX:SurvivorRatio=8。Eden和Survivor的比值。
     老年代=整个堆大小-新生代-永久代
     -XX:Permsize=512m,设置永久代初始值。
@@ -486,7 +567,7 @@ https://www.journaldev.com/java-interview-questions
     Full GC 是清理整个堆空间—包括年轻代和永久代
 
 9.JVM内存机制
-    程序计数器，java虚拟机栈，本地方法栈，java堆，方法取，直接内存
+    程序计数器，java虚拟机栈，本地方法栈，java堆，方法区，直接内存
     JDK 1.7 及以后的版本已经将字符串常量池从永久代中移除
 
 10.java内存模型；
@@ -522,6 +603,15 @@ https://www.journaldev.com/java-interview-questions
    3. 对齐填充
          JVM要求对象的大小必须是8的整数倍，若不是，需要补位对齐
 
+15.谈谈对jvm的理解
+
+16.几种配合使用的垃圾回收器
+    -XX：+UseSerialGC 参数可以指定使用Serial（新生代串行收集器）+ Serial Old（老年代串行收集器）
+    -XX:+UseParNewGC，表示ParNew（并行收集器）+ Serial Old（串行收集器）
+    -XX:+UseParallelGC，会使用Parallel Scavenge（新生代并行回收收集器） + SerialOld的回收器组合
+    -XX:+UseParallelOldGC，表示Parallel Scavenge（新生代并行回收收集器）+ Parallel Old（并行回收收集器）
+    CMS 只能配 Serial 或 ParNew
+    Parallel Scavenge 只能配 Serial Old 或 Parallel Old
 -------------------------------
 -------------------------------
 mysql
@@ -563,6 +653,32 @@ mysql
     MyIASM，B+树，数据结构中存储的内容实际上是实际数据的地址值。也就是说它的索引和实际数据是分开的，只不过使用索引指向了实际数据。这种索引的模式被称为非聚集索引
 
 5. sql语句的优化
+
+6.数据库事务实现的底层机制
+    innodb通过undo log和redo log来实现。
+
+
+7.阐述一下Mysql事务的四个特性
+    事务的四大特性（ACID）：
+    1.原子性（atomicity）：一个事务必须视为一个不可分割的最小工作单元，整个事务中的所有操作要么全部提交成功，要么全部失败回滚，对于一个事务来说，不可能只执行其中的一部分操作，这就是事务的原子性。
+    2.一致性（consistency）：数据库总数从一个一致性的状态转换到另一个一致性的状态。
+    3.隔离性（isolation）：一个事务所做的修改在最终提交以前，对其他事务是不可见的。
+    4.持久性（durability）：一旦事务提交，则其所做的修改就会永久保存到数据库中。此时即使系统崩溃，修改的数据也不会丢失。
+
+8.事务四个隔离级别
+    由低到高分别为Read uncommitted 、Read committed 、Repeatable read 、Serializable 。而且，在事务的并发操作中可能会出现脏读，不可重复读，幻读
+    大多数数据库默认的事务隔离级别是Read committed，比如Sql Server , Oracle。MySQL的默认隔离级别是Repeatable read
+    https://blog.csdn.net/csdnxingyuntian/article/details/57081233
+
+9.mysql主从同步问题
+    binlog
+----------------------------------------------
+---------------------------------------------
+    IO
+
+1.IO流的层次结构
+    5个类和一个接口。5个类指的是File、OutputStream、InputStream、Writer、Reader；一个接口指的是Serializable
+
 
 ----------------------------------------------
 ---------------------------------------------
@@ -682,6 +798,35 @@ mysql
 29. static变量存储在哪里
 30. java接口比抽象类方法执行效率差有没有依据
 
+31.请说出常用的异常类型
+    NullpointException（空指针异常）
+    ClassNotFoundException（类找不到异常）
+    ClassCastException（类型转换异常）
+    IllegalArgumentException（非法参数异常）
+    ArithmeticException（算术异常）
+    NumberFormatException（数据格式异常）
+    IndexOutOfBoundsException（数组下标越界异常）
+    IllegalStateException（非法语句异常）
+
+32.SKU的全称是什么，SKU与SPU的区别及关系？
+    SPU是标准化产品单元，区分品种；SKU是库存量单位，区分单品；商品特指与商家有关的商品，可对应多个SKU。
+    iphone7就是一个SPU，路虎车也是一个SPU，这个与商家无关，与颜色、款式、套餐也无关
+    SKU就是库存的最小单位，在服装行业，正常情况是“单款单色单码
+
+33.FileInputStream在使用完以后，不关闭流，想二次使用可以怎么操作？
+    调用reset
+
+34. 一致性哈希
+    是使用一个哈希函数计算数据或数据特征的哈希值，令该哈希函数的输出值域为一个封闭的环，最大值+1=最小值。将节点随机分布到这个环上，
+    每个节点负责处理从自己开始顺时针至下一个节点的全部哈希值域上的数据
+
+35.Java中 try..catch关闭流的语法糖?
+    try-with-resource
+    try(BufferedInputStream bin = new BufferedInputStream(new FileInputStream(new File("test.txt"))){
+
+    }catch{
+    }
+
 --------------------------------------
 https://www.journaldev.com/java-interview-questions
 
@@ -765,4 +910,50 @@ redis是单线程吗，怎么保证那么快的响应，线程安全吗，lua脚
 几种阻塞队列的区别，一般用哪种，为什么
 指令重排会导致线程安全吗
 领域建模，技巧
+-----------------------------------------
 
+遇到过哪些问题，怎么解决的？
+
+1.cat报警长GC
+    CMS+parNew
+    CMS垃圾回收的6个重要阶段
+    initial-mark 初始标记（CMS的第一个STW阶段），标记GC Root直接引用的对象，GC Root直接引用的对象不多，所以很快。
+    concurrent-mark 并发标记阶段，由第一阶段标记过的对象出发，所有可达的对象都在本阶段标记。
+    concurrent-preclean 并发预清理阶段，也是一个并发执行的阶段。在本阶段，会查找前一阶段执行过程中,从新生代晋升或新分配或被更新的对象。通过并发地重新扫描这些对象，预清理阶段可以减少下一个stop-the-world 重新标记阶段的工作量。
+    concurrent-abortable-preclean 并发可中止的预清理阶段。这个阶段其实跟上一个阶段做的东西一样，也是为了减少下一个STW重新标记阶段的工作量。增加这一阶段是为了让我们可以控制这个阶段的结束时机，比如扫描多长时间（默认5秒）或者Eden区使用占比达到期望比例（默认50%）就结束本阶段。
+    remark 重标记阶段（CMS的第二个STW阶段），暂停所有用户线程，从GC Root开始重新扫描整堆，标记存活的对象。需要注意的是，虽然CMS只回收老年代的垃圾对象，但是这个阶段依然需要扫描新生代，因为很多GC Root都在新生代，而这些GC Root指向的对象又在老年代，这称为“跨代引用”。
+    concurrent-sweep ，并发清理。
+
+    虽然abortable-preclean阶段是concurrent的，不会暂停其他的用户线程。就算不优化，可能影响也不大。
+    -XX:CMSMaxAbortablePrecleanTime=5000 ，默认值5s，代表该阶段最大的持续时间
+    -XX:CMSScheduleRemarkEdenPenetration=50 ，默认值50%，代表Eden区使用比例超过50%就结束该阶段进入remark
+    -XX:+CMSScavengeBeforeRemark 尝试在remark阶段之前进行一次Minor GC，以降低新生代的占用。
+
+
+2.一个与内存有关的慢ygc案例,特征是sys的耗时比较大
+    user是运行在user-mode的cpu耗时
+    sys是运行在kernel-mode的cpu耗时，也就是收系统调用消耗的cpu时间
+    real是整个gc事件的耗时(wall clock time)，等待IO的时间也计算在内
+
+    2018-10-05T17:13:05.196+0800: 538846.787: [GC2018-10-05T17:13:05.198+0800: 538846.789: [ParNew: 4507516
+    K->13367K(5392704K), 0.9845820 secs] 6979356K->2485260K(8538432K), 0.9866930 secs] [Times: user=1.08 sy
+    s=1.00, real=0.98 secs]
+    2018-10-05T14:03:16.392+0800: 527457.983: [GC2018-10-05T14:03:16.394+0800: 527457.984: [ParNew: 4507188
+    K->12317K(5392704K), 0.4408950 secs] 6931811K->2437191K(8538432K), 0.4430040 secs] [Times: user=0.61 sy
+    s=0.44, real=0.45 secs]
+
+    启动参数加上-XX:+AlwaysPreTouch
+    如果没有提前申请好内存，gc时年轻代向老年代copy对象的时候，老年代需要临时向OS申请内存。
+    AlwaysPreTouch意味着在Jvm启动的时候申请好heap内存，堆内的每个page在启动的时候初始化为0，避免Jvm运行过程中临时向OS申请内存。
+        -Xmx4G \ 设置JVM最大可用内存
+        -Xms4G \ 此值可以设置与-Xmx相同，以避免每次垃圾回收完成后JVM重新分配内存。
+        -Xmn2G \ 设置年轻代大小
+        -Xss256K \ 设置每个线程的堆栈大小
+        -XX:PermSize=256M \
+        -XX:SurvivorRatio=8 设置年轻代中Eden区与Survivor区的大小比值
+
+3.提供了一个jar，跑一台机器后发现性能有所降低，日志不输出
+
+lizhi框架
+governator 和 Guice ，guice是google出品的一个轻量级的依赖注入框架，
+governator 则是guice的增强版：类路径扫描和自动绑定、生命周期管理、对字段映射的配置、字段验证和并行对象预热。
