@@ -196,23 +196,54 @@ public class FileUtils {
         return records;
     }
 
-    public static void main(String[] args) {
+    /**
+     * 读用户id
+     */
+    private static void readUserId(){
         try {
             //读取某个标签下的用户id集合
             StringBuilder text = new StringBuilder();
             Set<String> userIds = read("/Users/majiali/Desktop/user_data.txt");
 
             //插入标签详情数据
-            Integer labelId= 1;
-            int index = 1;
+            Integer labelId= 2;
+            int index = 129;
             for(String userId : userIds){
-                text.append(String.format("(%d, %d, %d, '2019-04-26 15:35:18', '2019-04-26 15:35:18'),\n", index++, labelId, Long.parseLong(userId)));
+                text.append(String.format("(%d, %d, %d, '2019-05-16 15:35:18', '2019-05-16 15:35:18'),\n", index++, labelId, Long.parseLong(userId)));
             }
 
             //写入文件
             addToFile(text.toString());
         } catch (IOException e) {
         }
+    }
+
+    /**
+     * 读渠道号
+     */
+    private static void readChannelCode(){
+        try {
+            //读取某个标签下的用户id集合
+            StringBuilder text = new StringBuilder();
+            Set<String> channelCodes = read("/Users/majiali/Desktop/channel_data.txt");
+
+            //插入标签详情数据
+            Integer labelId= 2;
+            int index = 55;
+            for(String channelCode : channelCodes){
+                text.append(String.format("(%d, %s, %d, 0, 1, '2018-05-31 15:35:18', '2018-05-31 15:35:18'),\n", index++, "'"+channelCode+"'", labelId));
+            }
+
+            //写入文件
+            addToFile(text.toString());
+        } catch (IOException e) {
+        }
+    }
+
+
+
+    public static void main(String[] args) {
+        readChannelCode();
     }
 
 
